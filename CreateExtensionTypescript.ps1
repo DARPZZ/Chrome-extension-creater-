@@ -120,7 +120,7 @@ function Create-PackageJson {
   "scripts": {
     "build:v2": "cross-env MANIFEST_VERSION=2 webpack --config webpack/webpack.config.js",
     "build:v3": "cross-env MANIFEST_VERSION=3 webpack --config webpack/webpack.config.js",
-    "build:all": "npm run build:v2 && npm run build:v3"
+    "build": "npm run build:v2 && npm run build:v3"
   },
   "keywords": [],
   "author": "",
@@ -140,7 +140,7 @@ function Create-PackageJson {
     Write-FileUtf8NoBom -Path "$root/package.json" -Content $content
 }
 
-function Create-ManifestJson {
+function Create-ManifestJson-v3 {
     param (
         [string]$root
     )
@@ -162,6 +162,33 @@ function Create-ManifestJson {
     Write-Host "Creating manifest.json in '$root/public'..."
     Write-FileUtf8NoBom -Path "$root/public/manifest.json" -Content $content
 }
+
+
+function Create-ManifestJson-v2 {
+    param (
+        [string]$root
+    )
+    $content = @"
+{
+   "name": "$projectName",
+   "description": "This extension is made for demonstration purposes",
+   "version": "1.0",
+   "manifest_version": 2,
+   "permissions": [
+      "activeTab",
+      "scripting"
+   ],
+   "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+}
+"@
+    Write-Host "Creating manifest.json in '$root/public'..."
+    Write-FileUtf8NoBom -Path "$root/public/manifest.json" -Content $content
+}
+
+
 
 function Create-BackgroundTs {
     param (
@@ -209,7 +236,8 @@ function Main {
     Create-TsConfig -root $projectDir
     Create-WebpackConfig -root $projectDir
     Create-PackageJson -root $projectDir -projectName $projectName
-    Create-ManifestJson -root $projectDir
+    Create-ManifestJson-v3 -root $projectDir
+    Create-ManifestJson-v2 -root $projectDir
     Create-BackgroundTs -root $projectDir
     Open-VSCode -root $projectDir
 }
